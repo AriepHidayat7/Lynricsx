@@ -99,27 +99,25 @@ jobs:
           targets: x86_64-pc-windows-gnu
 
       # `npm run tauri:build` compiles a Windows resource with the GNU toolchain,
-      # which needs MinGW `windres`. The windows runner image ships GCC and GNU
-      # Binutils, so the usual case is simply making them discoverable; WinLibs is
-      # downloaded only as a fallback when `windres` is genuinely absent. The step
-      # is non-fatal: the build itself reports a clear error if it is missing.
-      - name: Ensure MinGW windres is available
+      # and the runner image's own `windres` (C:\mingw64) fails at the
+      # preprocessing stage for this .rc file. WinLibs is installed and placed
+      # first on PATH so scripts/with-tools.mjs picks it up instead. Non-fatal:
+      # the build itself reports a clear error if windres is still missing.
+      - name: Install WinLibs (MinGW windres)
         shell: pwsh
         continue-on-error: true
         run: |
-          $found = Get-ChildItem "C:\", "C:\ProgramData", "C:\tools" -Recurse -Filter windres.exe -ErrorAction SilentlyContinue | Select-Object -First 1
-          if ($found) {
-            "Using existing windres: $($found.FullName)"
-            $found.Directory.FullName | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8
-            exit 0
-          }
-          "windres not found on the image; downloading WinLibs."
-          $url = "https://github.com/brechtsanders/winlibs_mingw/releases/download/15.2.0posix-14.0.0-ucrt-r3/winlibs-x86_64-posix-seh-gcc-15.2.0-mingw-w64ucrt-14.0.0-r3.zip"
+          $url = "https://github.com/brechtsanders/winlibs_mingw/releases/download/16.2.0posix-14.0.0-ucrt-r3/winlibs-x86_64-posix-seh-gcc-16.2.0-mingw-w64ucrt-14.0.0-r3.zip"
           $zip = Join-Path $env:RUNNER_TEMP "winlibs.zip"
           Invoke-WebRequest -Uri $url -OutFile $zip
           Expand-Archive -Path $zip -DestinationPath "C:\WinLibs" -Force
           $bin = Get-ChildItem "C:\WinLibs" -Recurse -Filter windres.exe | Select-Object -First 1
-          if ($bin) { $bin.Directory.FullName | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8 }
+          if ($bin) {
+            "Using WinLibs windres: $($bin.FullName)"
+            $bin.Directory.FullName | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8
+          } else {
+            "WinLibs windres not found; the build will fall back to the image's MinGW."
+          }
 
       - name: Cache Cargo registry and target
         uses: Swatinem/rust-cache@v2
