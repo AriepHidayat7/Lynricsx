@@ -382,9 +382,14 @@ mod tests {
     #[test]
     fn plain_to_lines_trims_blanks() {
         let lines = plain_to_lines("a\n\nb\n\n");
-        assert_eq!(lines.len(), 2);
+        // Blank runs collapse to ONE blank line, which is kept: the overlay
+        // renders `l.text || "\u{a0}"`, so a stanza break is a visible gap, not
+        // something to delete. Trailing blanks at the end of the file *are*
+        // dropped, so the result ends on "b".
+        assert_eq!(lines.len(), 3);
         assert_eq!(lines[0].text, "a");
-        assert_eq!(lines[1].text, "b");
+        assert_eq!(lines[1].text, "");
+        assert_eq!(lines[2].text, "b");
         assert_eq!(lines[0].start_ms, -1);
         assert_eq!(lines[0].end_ms, -1);
     }

@@ -86,7 +86,7 @@ Every feature below is present in this version.
 - **Dynamic virtual filename** derived from track metadata, e.g.
   `backburner.niki.lyrics.ts` (lowercased, accents folded, punctuation
   hyphenated). Nothing is written to disk.
-- **Frameless, always-on-top overlay** with click-through, drag positioning,
+- **Frameless, always-on-top overlay** with drag positioning,
   position lock and remembered geometry on scaled or negative-origin monitors.
 
 ### Playback
@@ -299,9 +299,9 @@ check that the player is actually visible to Windows (Windows volume flyout
 should show the track).
 
 **The overlay is gone / I cannot click it.**
-It may be behind other windows or in click-through mode. Re-enable it from the
-control panel: **General → overlay visibility**, and clear **click-through**.
-Use **lock position** only after placing it.
+It may be behind other windows or hidden. Re-enable it from the control panel:
+**General → overlay visibility**. If it is in the way, drag it by its background,
+or enable **lock position** only after placing it.
 
 **Nothing builds: `windres` not found.**
 Install MinGW binutils (`winget install BrechtSanders.WinLibs.POSIX.UCRT`). The

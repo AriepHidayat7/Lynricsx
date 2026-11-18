@@ -1372,8 +1372,10 @@ mod tests {
     #[test]
     fn changing_typewriter_does_not_change_geometry() {
         let before = user_settings();
+        // The typewriter is permanently on (`sanitize` forces it), so a legacy
+        // `false` must not disable it — but it must still never move the window.
         let after = apply(&before, serde_json::json!({ "typewriter": false }));
-        assert!(!after.typewriter);
+        assert!(after.typewriter, "the typewriter is always on");
         assert!(!geometry_changed(&before, &after));
     }
 

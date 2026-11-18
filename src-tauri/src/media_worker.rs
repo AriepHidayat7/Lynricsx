@@ -358,10 +358,12 @@ mod tests {
         assert!(!is_seek(82_060, 86_568, 4_541));
         assert!(!is_seek(86_568, 91_079, 4_535));
         assert!(!is_seek(91_079, 95_586, 4_533));
-        // A coarse 5 s step sampled 250 ms apart is still playback.
-        assert!(!is_seek(10_000, 15_000, 250));
         // Steady 250 ms progression.
         assert!(!is_seek(10_000, 10_250, 250));
+        // A coarse 5 s step *sampled 250 ms apart* is indistinguishable from a
+        // forward scrub, so it is intentionally treated as a seek: the overlay
+        // re-syncs instead of drifting for 4.75 s. See SEEK_PREDICT_SLACK_MS.
+        assert!(is_seek(10_000, 15_000, 250), "5 s jump in 250 ms is a seek");
     }
 
     #[test]

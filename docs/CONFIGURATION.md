@@ -36,7 +36,7 @@ The file is pretty-printed JSON with camelCase keys. Defaults below are from
 | `typewriter` | bool | `true` | Typewriter reveal animation |
 | `historyLines` | int | `10` | Visible lyric lines, `1`–`20` (active line included) |
 | `cursorStyle` | string | `"block"` | `block`, `line`, `underline`, `bar`, `hollow`, `off` |
-| `clickThrough` | bool | `false` | Let clicks pass to the window below |
+| `clickThrough` | bool | `false` | **Retired.** Accepted for compatibility but always forced to `false` on load. |
 | `alwaysOnTop` | bool | `true` | Keep the overlay above other windows |
 | `linesBefore` | int | `1` | History lines kept above the active line |
 | `linesAfter` | int | `2` | Upcoming lines shown below the active line |

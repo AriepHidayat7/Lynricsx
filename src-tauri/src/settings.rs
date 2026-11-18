@@ -429,12 +429,12 @@ mod tests {
         assert_eq!(parsed.anchor, Anchor::TopRight);
         assert_eq!(parsed.completed_word_color, "accent");
         assert!(parsed.lock_position);
-        // A persisted `clickThrough: true` must load without error but be
-        // neutralised, so the retired feature can never reactivate.
-        assert!(parsed.click_through, "the raw value is still read");
+        // Legacy `clickThrough` keys (and any other retired option) must load
+        // without error and be neutralised, so a retired feature can never
+        // reactivate from an old settings file. `sanitize` forces it off.
         assert!(
             !parsed.sanitize().click_through,
-            "click-through must be forced off after sanitize"
+            "click-through must stay off after sanitize"
         );
     }
 
@@ -448,14 +448,15 @@ mod tests {
     #[test]
     fn removed_settings_are_no_longer_serialized() {
         let text = serde_json::to_string(&Settings::default()).unwrap();
-        for legacy in [
-            "opacity",
-            "scanlines",
-            "scanlineIntensity",
-            "wordIntensity",
-            "cursorStyle",
-        ] {
+        // Only keys that were fully retired. `cursorStyle` is deliberately NOT
+        // in this list: the six caret styles are still a live, user-facing
+        // setting, so it must keep being serialized.
+        for legacy in ["opacity", "scanlines", "scanlineIntensity", "wordIntensity"] {
             assert!(!text.contains(legacy), "{legacy} is still serialized");
         }
+        assert!(
+            text.contains("cursorStyle"),
+            "cursorStyle is still a supported setting and must be persisted"
+        );
     }
 }
