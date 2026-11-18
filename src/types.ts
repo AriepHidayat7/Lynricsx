@@ -18,6 +18,15 @@ export interface TransportResult {
 }
 
 export type Theme = "terminal" | "cyberpunk" | "minimal";
+/**
+ * Screen corner the overlay position is resolved against.
+ *
+ * NOTE: the on-disk / serde wire format is all-lowercase (`"topright"`), because
+ * the Rust enum uses `#[serde(rename_all = "lowercase")]`. The camelCase names
+ * below are the frontend's internal spelling only — `anchor` is never sent over
+ * IPC, so nothing needs to translate between the two. If that ever changes,
+ * serialize it as lowercase.
+ */
 export type Anchor = "topLeft" | "topRight" | "bottomLeft" | "bottomRight" | "custom";
 
 export interface TrackSnapshot {

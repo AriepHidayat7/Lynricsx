@@ -403,7 +403,7 @@ mod tests {
             "overlayY": 260,
             "overlayWidth": 640,
             "overlayHeight": 420,
-            "anchor": "topRight",
+            "anchor": "topright",
             "fontSize": 26,
             "theme": "cyberpunk",
             "typewriter": false,
