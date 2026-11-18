@@ -48,21 +48,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # `dtolnay/rust-toolchain` accepts only a bare channel name ("stable"),
-      # never a target tuple — passing "stable-x86_64-pc-windows-gnu" fails with
-      # `error: target tuple in channel name`. The GNU host used for the shipped
-      # build comes from rust-toolchain.toml, which rustup applies inside this
-      # directory; the runner needs both host toolchains because the tests must
-      # run on MSVC (see the note below).
-      - name: Set up Rust (stable, with the GNU target)
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          toolchain: stable
-          targets: x86_64-pc-windows-gnu
-
-      - name: Install MSVC toolchain for tests
+      # rust-toolchain.toml pins `channel = "stable-x86_64-pc-windows-gnu"`, and
+      # rustup rejects a target tuple in `channel` when it has to *install* the
+      # toolchain ("error: target tuple in channel name"). That only bites on a
+      # fresh runner, so both host toolchains are installed explicitly here with
+      # rustup, which does accept the tuple. `dtolnay/rust-toolchain` is avoided
+      # for that reason; it cannot express this pin.
+      - name: Install Rust toolchains (GNU host + MSVC for tests)
         shell: pwsh
-        run: rustup toolchain install stable-x86_64-pc-windows-msvc --profile minimal
+        run: |
+          rustup set profile default
+          rustup toolchain install stable-x86_64-pc-windows-gnu --profile minimal --no-self-update
+          rustup toolchain install stable-x86_64-pc-windows-msvc --profile minimal --no-self-update
+          rustup target add x86_64-pc-windows-gnu --toolchain stable-x86_64-pc-windows-msvc
 
       - name: Cache Cargo registry and target
         uses: Swatinem/rust-cache@v2
