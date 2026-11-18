@@ -48,24 +48,31 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # rust-toolchain.toml pins the GNU host (the project's default build path),
-      # so the MSVC toolchain used for test execution is requested explicitly.
-      - name: Set up Rust (GNU host, from rust-toolchain.toml)
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Set up Rust (MSVC, for running unit tests)
+      # `dtolnay/rust-toolchain` accepts only a bare channel name ("stable"),
+      # never a target tuple — passing "stable-x86_64-pc-windows-gnu" fails with
+      # `error: target tuple in channel name`. The GNU host used for the shipped
+      # build comes from rust-toolchain.toml, which rustup applies inside this
+      # directory; the runner needs both host toolchains because the tests must
+      # run on MSVC (see the note below).
+      - name: Set up Rust (stable, with the GNU target)
         uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: stable-x86_64-pc-windows-msvc
+          toolchain: stable
+          targets: x86_64-pc-windows-gnu
+
+      - name: Install MSVC toolchain for tests
+        shell: pwsh
+        run: rustup toolchain install stable-x86_64-pc-windows-msvc --profile minimal
 
       - name: Cache Cargo registry and target
         uses: Swatinem/rust-cache@v2
         with:
           workspaces: src-tauri
 
+      # Type-checks the real GNU build path (what `npm run tauri:build` uses).
       - name: Type check (including tests)
         working-directory: src-tauri
-        run: cargo check --tests --all-targets
+        run: cargo check --target x86_64-pc-windows-gnu --tests --all-targets
 
       # Unit tests run on MSVC: on the GNU host the test harness fails to load
       # (0xC0000139) because both windows 0.58 and 0.62 are linked. See
@@ -87,8 +94,34 @@ jobs:
           node-version: 20
           cache: npm
 
-      - name: Set up Rust
+      - name: Set up Rust (stable, with the GNU target)
         uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          targets: x86_64-pc-windows-gnu
+
+      # `npm run tauri:build` compiles a Windows resource with the GNU toolchain,
+      # which needs MinGW `windres`. The windows runner image ships GCC and GNU
+      # Binutils, so the usual case is simply making them discoverable; WinLibs is
+      # downloaded only as a fallback when `windres` is genuinely absent. The step
+      # is non-fatal: the build itself reports a clear error if it is missing.
+      - name: Ensure MinGW windres is available
+        shell: pwsh
+        continue-on-error: true
+        run: |
+          $found = Get-ChildItem "C:\", "C:\ProgramData", "C:\tools" -Recurse -Filter windres.exe -ErrorAction SilentlyContinue | Select-Object -First 1
+          if ($found) {
+            "Using existing windres: $($found.FullName)"
+            $found.Directory.FullName | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8
+            exit 0
+          }
+          "windres not found on the image; downloading WinLibs."
+          $url = "https://github.com/brechtsanders/winlibs_mingw/releases/download/15.2.0posix-14.0.0-ucrt-r3/winlibs-x86_64-posix-seh-gcc-15.2.0-mingw-w64ucrt-14.0.0-r3.zip"
+          $zip = Join-Path $env:RUNNER_TEMP "winlibs.zip"
+          Invoke-WebRequest -Uri $url -OutFile $zip
+          Expand-Archive -Path $zip -DestinationPath "C:\WinLibs" -Force
+          $bin = Get-ChildItem "C:\WinLibs" -Recurse -Filter windres.exe | Select-Object -First 1
+          if ($bin) { $bin.Directory.FullName | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8 }
 
       - name: Cache Cargo registry and target
         uses: Swatinem/rust-cache@v2
