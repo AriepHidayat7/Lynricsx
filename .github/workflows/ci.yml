@@ -130,6 +130,14 @@ jobs:
         run: npm ci
 
       - name: Build application and NSIS installer
+        shell: pwsh
+        env:
+          # `windres` (invoked by tauri-build to compile the Windows resource)
+          # failed with "couldn't open temporary file" because it defaults to
+          # %TMP% for its intermediate files. Point it at a directory that is
+          # definitely writable on the runner.
+          TMP: ${{ runner.temp }}
+          TEMP: ${{ runner.temp }}
         run: npm run tauri:build
 
       # Artifact only. Creating a GitHub Release is a deliberate manual step and
