@@ -1,0 +1,93 @@
+# ---------------------------------------------------------------------------
+# Lynricsx — repository hygiene
+#
+# Goal: track source, tests, docs, lockfiles and Tauri configuration only.
+# Everything generated, machine-specific or private stays out of the repo.
+# ---------------------------------------------------------------------------
+
+# --- Node / frontend -------------------------------------------------------
+node_modules/
+dist/
+dist-ssr/
+.vite/
+*.local
+
+# --- Rust / Tauri build output --------------------------------------------
+src-tauri/target/
+# Tauri regenerates the ACL manifests and schemas from tauri.conf.json and the
+# capability files on every build, so they are build output, not source.
+src-tauri/gen/
+
+# --- Installer and packaged bundles ---------------------------------------
+# NSIS output and any copied installer or portable build must never be committed.
+src-tauri/target/**/*.exe
+*.msi
+*.msix
+*.appx
+*.msixbundle
+
+# --- Runtime data ----------------------------------------------------------
+# Lynricsx writes its settings, lyrics cache and diagnostic logs under
+# %APPDATA%\com.redlyrics.app and %LOCALAPPDATA%\Lynricsx. Those never live in
+# the project directory, but local copies are ignored defensively.
+settings.json
+logs/
+lyrics-cache/
+gsmtc.log
+
+# --- Logs and diagnostic output (incl. build/probe logs) -------------------
+*.log
+dev.log
+build.log
+rtest.log
+cap.log
+npm-debug.log*
+yarn-error.log*
+
+# --- Secrets and local environment ----------------------------------------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.keystore
+# Tauri signing keys for updater/installer (never publish).
+*.sig
+src-tauri/keys/
+src-tauri/.tauri/
+
+# --- Temporary debugging tools and agent scratch files --------------------
+# The CDP probes under scripts/ that are worth keeping are tracked
+# deliberately (cdp.mjs, probe scripts). Ad-hoc throwaways are ignored here.
+scripts/dbg.mjs
+scripts/tmp-*.mjs
+scripts/*.local.mjs
+*.tmp
+*.bak
+*.orig
+*.rej
+.recovery-backup/
+
+# --- Editor / IDE personal configuration ----------------------------------
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.iml
+*.suo
+*.user
+*.swp
+*~
+
+# --- OS cruft --------------------------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# --- Generated assets ------------------------------------------------------
+# app-icon.png is an intermediate produced by `npm run icon`; the committed
+# icon set lives in src-tauri/icons/.
+app-icon.png

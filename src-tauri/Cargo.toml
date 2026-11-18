@@ -1,0 +1,43 @@
+[package]
+name = "redlyrics"
+version = "0.1.0"
+description = "Lynricsx - a terminal-inspired, code-styled lyrics overlay for Windows"
+authors = ["Lynricsx"]
+edition = "2021"
+
+[lib]
+name = "redlyrics_lib"
+crate-type = ["rlib", "staticlib"]
+
+[profile.dev]
+# Development builds keep incremental compilation on for fast iteration.
+incremental = true
+
+[profile.release]
+codegen-units = 4
+lto = false
+opt-level = 2
+panic = "abort"
+strip = true
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["image-png"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+log = "0.4"
+reqwest = { version = "0.12", default-features = false, features = ["json", "default-tls"] }
+tokio = { version = "1", features = ["time", "sync"] }
+windows = { version = "0.58", features = [
+  "Win32_Foundation",
+  "Win32_System_Com",
+  "Win32_System_Registry",
+  "Win32_System_WinRT",
+  "Win32_UI_Input_KeyboardAndMouse",
+  "Win32_UI_WindowsAndMessaging",
+  "Foundation",
+  "Foundation_Collections",
+  "Media_Control",
+] }

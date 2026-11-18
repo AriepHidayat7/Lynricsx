@@ -1,0 +1,1149 @@
+/* ---------------------------------------------------------------------------
+   Lynricsx overlay styles
+   ---------------------------------------------------------------------------
+   Two independent colour systems live here, deliberately kept apart:
+
+   1. APPEARANCE PRESET (`.overlay.theme-<preset>`, chosen in Settings)
+      Owns the overlay's *visual identity*: editor background, gutters, header
+      and footer chrome, borders, brand/accent colour, song title and the neutral
+      comment grey. Never touches lyric hues.
+
+   2. PER-TRACK SYNTAX PALETTE (`.overlay[data-syntax="<palette>"]`, picked
+      deterministically from the track seed)
+      Owns the *hue* of generated lyric code: head identifier, member after the
+      dot, quoted argument, punctuation. Never touches the chrome.
+
+   The two systems compose, so a song using the GitHub Dark palette can be shown
+   with the Cyberpunk appearance preset, and switching presets never changes a
+   track's palette selection.
+   --------------------------------------------------------------------------- */
+
+:root {
+  /* VS Code editor typography */
+  --ov-font: "Cascadia Code", Consolas, "Cascadia Mono", "Courier New", monospace;
+
+  /* Safe fallbacks; every appearance preset overrides these. */
+  --editor-bg: #1e1e1e;
+  --gutter-bg: #1e1e1e;
+  --header-bg: #252526;
+  --footer-bg: #252526;
+  --line-num: #858585;
+  --line-num-active: #c6c6c6;
+  --indent-guide: #404040;
+  --divider: #333333;
+
+  --syntax-text: #d4d4d4;
+  --syntax-blue: #9cdcfe;
+  --syntax-blue-alt: #4fc1ff;
+  --syntax-string: #ce9178;
+  --syntax-function: #dcdcaa;
+  --syntax-brace: #ffd700;
+  --syntax-keyword: #569cd6;
+  --syntax-number: #b5cea8;
+}
+
+/* =========================================================================
+   1. APPEARANCE PRESETS
+   ========================================================================= */
+
+/* ---- Terminal Red: dark graphite, red accents, subtle grey borders ---- */
+.overlay.theme-terminal {
+  --editor-bg: #141417;
+  --gutter-bg: #111114;
+  --header-bg: #1a1a1f;
+  --footer-bg: #101013;
+  --divider: #2a2a32;
+  --indent-guide: #34343d;
+  --line-num: #7a7681;
+  --line-num-active: #e6e2da;
+  --syntax-text: #e7e3db;
+  --accent: #ff3b3b;
+  --accent-soft: rgba(255, 59, 59, 0.14);
+  --prompt: #8d8a94;
+  --brand: #ff4d4d;
+  --brand-glow: 0 0 10px rgba(255, 59, 59, 0.35);
+  --comment-color: #8a8790;
+  --song-title: #f1ede5;
+  --song-artist: #8a8790;
+  --cursor: #ff3b3b;
+  --cursor-glow: rgba(255, 59, 59, 0.55);
+  --panel-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  --rule: #2a2a32;
+}
+
+/* ---- Cyberpunk: near-black violet, cyan + magenta accents ---- */
+.overlay.theme-cyberpunk {
+  --editor-bg: #0d0918;
+  --gutter-bg: #0a0713;
+  --header-bg: #150f26;
+  --footer-bg: #0a0713;
+  --divider: #2b2145;
+  --indent-guide: #3a2d5c;
+  --line-num: #6f6591;
+  --line-num-active: #e6dcff;
+  --syntax-text: #e8e3f7;
+  --accent: #ff2fd0;
+  --accent-soft: rgba(255, 47, 208, 0.16);
+  --prompt: #35e3ff;
+  --brand: #35e3ff;
+  --brand-glow: 0 0 12px rgba(53, 227, 255, 0.45);
+  --comment-color: #9d74c9;
+  --song-title: #f3ecff;
+  --song-artist: #9a8fc0;
+  --cursor: #35e3ff;
+  --cursor-glow: rgba(53, 227, 255, 0.6);
+  --panel-shadow: inset 0 1px 0 rgba(53, 227, 255, 0.08);
+  --rule: #3a2a5e;
+}
+
+/* ---- Minimal: neutral charcoal, muted grey accents, no decoration ---- */
+.overlay.theme-minimal {
+  --editor-bg: #1b1b1c;
+  --gutter-bg: #1b1b1c;
+  --header-bg: #1e1e1f;
+  --footer-bg: #1e1e1f;
+  --divider: #2c2c2e;
+  --indent-guide: #2f2f31;
+  --line-num: #6f6f72;
+  --line-num-active: #c9c9cb;
+  --syntax-text: #d7d7d8;
+  --accent: #9a9a9e;
+  --accent-soft: rgba(200, 200, 205, 0.1);
+  --prompt: #808084;
+  --brand: #cfcfd2;
+  --brand-glow: none;
+  --comment-color: #77777b;
+  --song-title: #e2e2e3;
+  --song-artist: #7e7e82;
+  --cursor: #c9c9cb;
+  --cursor-glow: none;
+  --panel-shadow: none;
+  --rule: #2c2c2e;
+}
+
+/* =========================================================================
+   2. PER-SONG SYNTAX PALETTES (deterministic, set via data-syntax)
+   ========================================================================= */
+
+/* ---- Per-song syntax palettes (deterministic, set via data-syntax) ---- */
+
+/* VS Code Dark+ — light blue / yellow / orange */
+.overlay[data-syntax="darkplus"] {
+  --r-head: #9cdcfe;
+  --r-member: #dcdcaa;
+  --r-argument: #ce9178;
+  --punct-accent: #ffd700;
+}
+
+/* One Dark Pro — cyan / lavender / mint */
+.overlay[data-syntax="onedark"] {
+  --r-head: #56b6c2;
+  --r-member: #c678dd;
+  --r-argument: #98c379;
+  --punct-accent: #abb2bf;
+}
+
+/* Dracula — cyan / pink / soft green */
+.overlay[data-syntax="dracula"] {
+  --r-head: #8be9fd;
+  --r-member: #ff79c6;
+  --r-argument: #50fa7b;
+  --punct-accent: #bd93f9;
+}
+
+/* GitHub Dark — teal / lavender / coral */
+.overlay[data-syntax="github"] {
+  --r-head: #4ec9b0;
+  --r-member: #b392f0;
+  --r-argument: #f0883e;
+  --punct-accent: #79c0ff;
+}
+
+/* Monokai — mint / yellow / magenta */
+.overlay[data-syntax="monokai"] {
+  --r-head: #a6e22e;
+  --r-member: #e6db74;
+  --r-argument: #f92672;
+  --punct-accent: #66d9ef;
+}
+
+/* Night Owl — lavender / teal / coral */
+.overlay[data-syntax="nightowl"] {
+  --r-head: #82aaff;
+  --r-member: #21c7a8;
+  --r-argument: #ecc48d;
+  --punct-accent: #c792ea;
+}
+
+/* Neutral defaults until a track (and therefore a palette) is known. */
+.overlay {
+  --r-head: #9cdcfe;
+  --r-member: #dcdcaa;
+  --r-argument: #ce9178;
+  --punct-accent: #d4d4d4;
+}
+
+html,
+body,
+#overlay-root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  background: #141417;
+  overflow: hidden;
+}
+
+::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+/* ---- Editor canvas ---- */
+.overlay {
+  /* Chrome fallbacks for a preset-less mount (e.g. first paint). */
+  --comment-color: #8a8790;
+  --panel-shadow: none;
+  --rule: var(--divider);
+
+  position: relative;
+  box-sizing: border-box;
+  height: 100%;
+  width: 100%;
+  font-family: var(--ov-font);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--syntax-text);
+  background: var(--editor-bg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  user-select: none;
+  -webkit-font-smoothing: antialiased;
+  box-shadow: var(--panel-shadow);
+}
+
+.overlay.locked {
+  pointer-events: auto;
+}
+
+.overlay > * {
+  pointer-events: none;
+}
+
+/* The lyric area must accept clicks for click-to-seek. The window drag still
+ * works because rows stop propagation in React and the header keeps the
+ * drag handler; only the body opts in. */
+.overlay > .ov-body {
+  pointer-events: auto;
+}
+
+/* Chrome containers hold interactive controls (transport, snapshot, replay).
+ * Re-enabling them here means a new control works without having to remember to
+ * set `pointer-events: auto` on every child. Non-interactive text inside simply
+ * has nothing to click, and the drag handler ignores control targets. */
+.overlay > .ov-header,
+.overlay > .ov-footer,
+.overlay > .ov-song {
+  pointer-events: auto;
+}
+
+/* ---- Header (editor tab strip) ---- */
+.ov-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: nowrap;
+  font-size: 13px;
+  line-height: 1.6;
+  letter-spacing: 0.2px;
+  padding: 10px 16px;
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--divider);
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  flex-shrink: 0;
+  color: var(--syntax-text);
+}
+
+.ov-prompt {
+  color: var(--prompt);
+  font-weight: 700;
+  flex: 0 0 auto;
+}
+
+.ov-brand {
+  color: var(--brand);
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-shadow: var(--brand-glow);
+  flex: 0 0 auto;
+}
+
+.ov-comment {
+  color: var(--comment-color);
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ov-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+  color: var(--line-num-active);
+}
+
+.ov-right .ov-dot {
+  color: var(--accent);
+}
+
+.ov-right .ov-time {
+  color: var(--line-num);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- Song information (above the editor) ---- */
+/*
+ * Title/artist on the left, playback controls on the right, vertically centred.
+ * `min-width: 0` on both children lets long titles ellipsize instead of pushing
+ * the controls out of the panel.
+ */
+.ov-song {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 16px 7px;
+  border-bottom: 1px solid var(--divider);
+  min-width: 0;
+  overflow: hidden;
+}
+
+.ov-song-info {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.ov-song-title {
+  font-size: 0.95em;
+  font-weight: 700;
+  color: var(--song-title);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ov-song-artist {
+  margin-top: 1px;
+  font-size: 0.78em;
+  color: var(--song-artist);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---- Editor viewport: gutter + code area ---- */
+.code-view {
+  flex: 0 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 0;
+  /* The composition can be taller than the available box (long, wrapped lines).
+     Scroll instead of clipping so the active line is always reachable. */
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  padding: 8px 16px 8px 0;
+}
+
+.code-view::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+.code-line {
+  display: flex;
+  align-items: flex-start;
+  line-height: 1.6;
+  min-width: 0;
+}
+
+/* Line-number gutter: fixed width, right aligned like VS Code. */
+.code-gutter {
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  width: 4ch;
+  padding-right: 1.25ch;
+  text-align: right;
+  color: var(--line-num);
+  font-variant-numeric: tabular-nums;
+  background: var(--gutter-bg);
+  border-right: 1px solid transparent;
+  user-select: none;
+  /* The gutter is a stack of one row per *visual* code row, so a brace line
+     that paints over several physical rows gets a matching gutter row for
+     each — no visible code is ever left without its own gutter slot. */
+  display: flex;
+  flex-direction: column;
+}
+
+/* One gutter slot per visual row; continuation rows stay blank but keep the
+   line box so the numbers align with the text rows beside them. */
+.gutter-row {
+  display: block;
+  /* Match the code text's line box exactly, so slot N lines up with painted
+     row N of the expression beside it. */
+  line-height: 1.6;
+  height: 1.6em;
+  white-space: pre;
+  overflow: hidden;
+}
+
+.code-line.active .code-gutter {
+  color: var(--line-num-active);
+}
+
+/* Code text area. Wrapped continuation lines align with the expression,
+   not with the line-number column. */
+.code-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding-left: 1.25ch;
+  padding-right: 8px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  /* Faint indentation guide behind the text block. */
+  box-shadow: inset 1px 0 0 var(--indent-guide);
+  background-image: linear-gradient(
+    to right,
+    transparent 0,
+    transparent 1px,
+    transparent 1px
+  );
+}
+
+.code-line.active .code-text {
+  box-shadow: inset 1px 0 0 var(--indent-guide);
+}
+
+/* Completed expressions: the "Past lyrics appearance" setting controls how
+   much they recede. Only opacity/brightness change here — the syntax palette
+   still decides every hue. */
+.code-line.prev {
+  opacity: var(--past-opacity);
+}
+
+/* Active-word styling lives in the palette section below. */
+
+.code-line.active {
+  opacity: 1;
+}
+
+/* ---- Syntax tokens ---- */
+.tk {
+  white-space: pre-wrap;
+}
+
+.tk-num {
+  color: var(--syntax-number);
+}
+
+.tk-fn {
+  color: var(--syntax-function);
+}
+
+.tk-ident {
+  color: var(--syntax-blue-alt);
+}
+
+.tk-quote {
+  color: var(--syntax-string);
+}
+
+/* Comment lines: one neutral colour for the `//` prefix and every word, so a
+   commented lyric never picks up identifier / string highlighting. The exact
+   grey follows the appearance preset. */
+.tk-comment {
+  color: var(--comment-color);
+}
+
+.tk-ws {
+  white-space: pre;
+}
+
+.tk-str {
+  color: var(--syntax-string);
+}
+
+/* Per-fragment playback highlight. Sung fragments only lose a little presence;
+   the hue still comes from the syntax palette below. */
+.tk-str.st-sung {
+  opacity: 0.92;
+}
+
+.tk-str.st-upcoming {
+  opacity: 0.85;
+}
+
+.tk-str.st-untyped {
+  color: var(--syntax-string);
+}
+
+/* Semantic lyric colours — the per-track palette owns these.
+   primary identifier -> `--r-head`, member after the dot -> `--r-member`,
+   quoted argument -> `--r-argument`. */
+.tk-str.r-head {
+  color: var(--r-head);
+}
+
+.tk-str.r-member {
+  color: var(--r-member);
+}
+
+.tk-str.r-argument {
+  color: var(--r-argument);
+}
+
+/* Punctuation picks up the palette accent (brackets, dots, semicolons). */
+.tk-punct {
+  color: var(--punct-accent);
+}
+
+/* The active line is fully saturated and readable: lift the palette colours
+   rather than overriding them, so every palette stays coherent. */
+.code-line.active .tk-str.r-head,
+.code-line.active .tk-str.r-member,
+.code-line.active .tk-str.r-argument {
+  filter: brightness(1.18) saturate(1.05);
+}
+
+.code-line.active .tk-str.st-active {
+  color: #ffffff;
+}
+
+/* An underscore inherits the colour of the lyric word it follows. */
+.tk-space {
+  color: inherit;
+}
+
+/* ---- Typewriter caret: one base element, six shapes ----
+   All shapes share the preset's accent colour and the same blink, and are
+   positioned identically (immediately after the last revealed character), so
+   the style only changes the silhouette. */
+.cursor {
+  display: inline-block;
+  vertical-align: text-bottom;
+  background: var(--cursor);
+  box-shadow: 0 0 6px var(--cursor-glow);
+  animation: cursor-blink 1.1s steps(2, start) infinite;
+  margin-left: 1px;
+}
+
+/* BLOCK — solid rectangle, classic terminal. */
+.cursor-block {
+  width: 0.58em;
+  height: 1.02em;
+  border-radius: 1px;
+}
+
+/* LINE — thin editor caret. */
+.cursor-line {
+  width: 1px;
+  height: 1.05em;
+  box-shadow: none;
+}
+
+/* UNDERLINE — horizontal rule beneath the current character. */
+.cursor-underline {
+  width: 0.6em;
+  height: 2px;
+  align-self: flex-end;
+  vertical-align: baseline;
+  border-radius: 1px;
+  box-shadow: none;
+}
+
+/* BAR — narrow vertical terminal bar, heavier than LINE. */
+.cursor-bar {
+  width: 3px;
+  height: 1.08em;
+  border-radius: 1px;
+}
+
+/* HOLLOW — outlined rectangle. */
+.cursor-hollow {
+  width: 0.58em;
+  height: 1.02em;
+  background: transparent;
+  border: 1.5px solid var(--cursor);
+  box-shadow: none;
+  border-radius: 1px;
+}
+
+/* OFF — hidden, but the typewriter keeps revealing text. */
+.cursor-none {
+  display: none;
+}
+
+/* ---- Body: sized to its content so no empty region is reserved ---- */
+.ov-body {
+  flex: 0 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Absorbs any surplus height so lyrics are never stretched or clipped. */
+.ov-spacer {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* ---- Body: terminal-only sessions claim the free height -------------------
+   The body is content-sized (`flex: 0 1 auto`) so lyrics are never stretched.
+   That default breaks the terminal, which is the body's *only* child while
+   nothing is rendered yet and is itself `flex: 1 1 auto; min-height: 0`:
+   a content-sized parent gives that child no definite height to grow into, so
+   it collapses to just its fixed chrome (file row + prompt) and `termFit`
+   measures ~90px, deciding zero log rows fit.
+
+   Visually this surfaced as "the terminal disappears when I change the font
+   size": any font bump made the fixed chrome taller than the collapsed body,
+   so the log went from N rows to 0 — and it never came back, because the
+   collapse depends on the box, not on the font.
+
+   A terminal-only body therefore has no content of its own to size to; it must
+   pass the available height down. Scoping this to `:has(> .terminal)` keeps the
+   lyric layout byte-for-byte unchanged: `.code-view` stays content-sized and
+   `.ov-spacer` still absorbs the surplus. */
+.ov-body:has(> .terminal) {
+  flex: 1 1 auto;
+}
+
+/* ---- Footer (editor status bar) ---- */
+.ov-footer {
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 6px 16px;
+  background: var(--footer-bg);
+  border-top: 1px solid var(--divider);
+  flex-shrink: 0;
+}
+
+.sync-tag {
+  font-size: 12px;
+  letter-spacing: 0.8px;
+  color: var(--line-num);
+}
+
+.sync-tag.word {
+  color: var(--accent);
+}
+
+/* =========================================================================
+   3. PAST LYRICS APPEARANCE  (completed-word colour setting)
+   =========================================================================
+   Composer output: `.overlay.completed-<mode>`.
+   Only opacity / brightness change, so the per-track syntax palette keeps
+   deciding every hue and unrelated tokens are never recoloured:
+     muted – palette hues, clearly receded (default)
+     dim   – palette hues, deepest fade, for a quieter overlay
+     hot   – palette hues, lifted; past lines stay as bright as the active one
+   ========================================================================= */
+
+.overlay {
+  --past-opacity: 0.62;
+}
+
+.overlay.completed-muted {
+  --past-opacity: 0.62;
+}
+
+.overlay.completed-dim {
+  --past-opacity: 0.35;
+}
+
+.overlay.completed-accent {
+  --past-opacity: 1;
+}
+
+.overlay.completed-accent .code-line.prev .tk-str {
+  filter: brightness(0.92) saturate(1.1);
+}
+
+/* ---- Overlay states ---- */
+.ov-notice {
+  text-align: left;
+  letter-spacing: 0.5px;
+  font-size: 14px;
+  color: var(--line-num);
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 0 8px calc(4ch + 1.25ch + 1.25ch);
+}
+
+.ov-plain {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-left: calc(4ch + 1.25ch + 1.25ch);
+}
+
+.ov-plain-line {
+  color: var(--syntax-string);
+  opacity: 0.85;
+  overflow-wrap: anywhere;
+}
+
+.overlay-empty {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 0 8px calc(4ch + 1.25ch + 1.25ch);
+  color: var(--line-num);
+  letter-spacing: 0.5px;
+}
+
+.overlay-empty .glyph {
+  color: var(--syntax-text);
+  opacity: 0.6;
+}
+
+@keyframes cursor-blink {
+  50% {
+    opacity: 0.15;
+  }
+}
+
+/* =========================================================================
+   4. PRESET-SPECIFIC DETAILING
+   ========================================================================= */
+
+/* Terminal Red: a thin red rule under the header reads like a prompt line. */
+.overlay.theme-terminal .ov-header {
+  border-bottom: 1px solid var(--rule);
+  box-shadow: inset 0 -1px 0 rgba(255, 59, 59, 0.28);
+}
+
+/* Cyberpunk: cyan/magenta edge light on the chrome, no lyric glow. */
+.overlay.theme-cyberpunk .ov-header {
+  border-bottom: 1px solid var(--rule);
+  box-shadow: inset 0 -1px 0 rgba(255, 47, 208, 0.3);
+}
+
+.overlay.theme-cyberpunk .ov-footer {
+  border-top: 1px solid var(--rule);
+}
+
+.overlay.theme-cyberpunk .ov-right .ov-dot {
+  color: var(--prompt);
+}
+
+/* Cyberpunk keeps the genre glow off the lyrics themselves, but the active
+   line gets a restrained magenta underline-free lift instead of a halo. */
+.overlay.theme-cyberpunk .code-line.active .tk-str.st-active {
+  color: #ffffff;
+  text-shadow: 0 0 6px rgba(255, 47, 208, 0.35);
+}
+
+/* Minimal: no decorative effects at all — flat chrome, no glows. */
+.overlay.theme-minimal .ov-header,
+.overlay.theme-minimal .ov-footer {
+  box-shadow: none;
+}
+
+.overlay.theme-minimal .ov-brand {
+  text-shadow: none;
+  letter-spacing: 0.4px;
+}
+
+.overlay.theme-minimal .cursor {
+  box-shadow: none;
+}
+
+.overlay.theme-minimal .code-line.active .tk-str.r-head,
+.overlay.theme-minimal .code-line.active .tk-str.r-member,
+.overlay.theme-minimal .code-line.active .tk-str.r-argument {
+  filter: none;
+}
+
+.overlay.theme-minimal .code-line.active .tk-str.st-active {
+  color: var(--line-num-active);
+  text-shadow: none;
+}
+
+@keyframes ov-pulse {
+  50% {
+    opacity: 0.3;
+  }
+}
+/* ---- Playback transport controls (beside the track info) ---- */
+/*
+ * Minimal, icon-only. No button chrome, borders or backgrounds: just three
+ * glyphs sitting beside the track. Colour comes from the preset variables, so
+ * Terminal Red, Cyberpunk and Minimal all work without theme-specific rules.
+ *
+ * `pointer-events: auto` is essential. `.overlay > *` sets `pointer-events:
+ * none` so the whole window can be dragged, and that is inherited by these
+ * buttons — without this they render but can never be hit-tested.
+ */
+.pc {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  flex: 0 0 auto;
+  pointer-events: auto;
+}
+
+.pc-btn {
+  /* Icon is 12px; padding gives a comfortable ~24px hit area. */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: none;
+  border-radius: 3px;
+  color: var(--line-num);
+  cursor: pointer;
+  pointer-events: auto;
+  transition: color 90ms linear, opacity 90ms linear;
+}
+
+/* Subtle hover: the glyph lifts to the accent. No background, no box. */
+.pc-btn:hover:not(:disabled) {
+  color: var(--accent);
+}
+
+.pc-btn:active:not(:disabled) {
+  color: var(--cursor);
+  opacity: 0.75;
+}
+
+.pc-btn:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.pc-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+/* Play/pause is the primary action, so it carries the accent. */
+.pc-toggle {
+  color: var(--accent);
+}
+
+/* Mid-command: dim while the transport is in flight (buttons are disabled). */
+.pc-btn.pending {
+  opacity: 0.5;
+}
+
+/* No session: the cluster reads as inactive, never as a false state. */
+.pc-off .pc-btn {
+  color: var(--line-num);
+  opacity: 0.25;
+}
+
+/* The SVG must not intercept the pointer; the button owns the hit area. */
+.pc-btn svg {
+  display: block;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pc-btn {
+    transition: none;
+  }
+}
+
+/* ---- Cinematic track transition ------------------------------------------
+ * A brief fade/slide when a new track takes over. Kept short (420 ms) and
+ * transform/opacity only, so it never reflows the lyric layout and never delays
+ * the first rendered line.
+ */
+.track-in {
+  animation: track-in 420ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+@keyframes track-in {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .track-in {
+    animation: none;
+  }
+}
+
+/* ---- Clickable lyric rows ------------------------------------------------
+ * Any row whose backing lyric has a real timestamp can be clicked to seek.
+ * Hover is deliberately faint: the lyrics stay the focus, and the cue only has
+ * to say "this is interactive".
+ */
+.code-line.seekable {
+  cursor: pointer;
+  pointer-events: auto;
+  border-radius: 2px;
+  transition: background-color 120ms ease;
+}
+
+.code-line.seekable:hover {
+  background: var(--accent-soft);
+}
+
+.code-line.seekable:active {
+  background: var(--accent-soft);
+  filter: brightness(1.15);
+}
+
+.code-line.seekable:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: -1px;
+}
+
+/* Non-seekable rows (unsynced lyrics) keep the default arrow. */
+.code-line:not(.seekable) {
+  cursor: default;
+}
+
+/* ---- Mini progress indicator ---------------------------------------------
+ * A hairline, not a player panel. The fill is driven by the real playback
+ * fraction, so it doubles as a compact position readout.
+ */
+.ov-progress {
+  flex: 0 0 auto;
+  display: block;
+  padding: 5px 0 4px;
+  cursor: pointer;
+  pointer-events: auto;
+  outline: none;
+}
+
+.ov-progress-track {
+  display: block;
+  height: 2px;
+  width: 100%;
+  background: var(--divider);
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.ov-progress-fill {
+  display: block;
+  height: 100%;
+  background: var(--cursor);
+  opacity: 0.85;
+  border-radius: 1px;
+  /* Linear interpolation between samples only; no springy easing. */
+  transition: width 140ms linear;
+}
+
+.ov-progress:hover .ov-progress-fill {
+  opacity: 1;
+}
+
+.ov-progress:focus-visible .ov-progress-track {
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.ov-progress.paused .ov-progress-fill {
+  opacity: 0.45;
+}
+
+/* ---- Snapshot notification ----------------------------------------------- */
+/* One reusable toast anchored to the top-right, below the header. It is
+ * pointer-events: none so it can never block the lyrics or the controls, and it
+ * is layered above the content without reserving any layout space. */
+.ov-toast {
+  position: absolute;
+  top: 44px;
+  right: 12px;
+  z-index: 40;
+  pointer-events: none;
+  max-width: min(360px, calc(100% - 24px));
+  opacity: 0;
+  transform: translateY(-6px);
+  transition:
+    opacity 180ms ease-out,
+    transform 180ms ease-out;
+}
+
+.ov-toast.shown {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.ov-toast-body {
+  pointer-events: auto;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 7px 11px;
+  border-radius: 4px;
+  background: #1b1b1f;
+  border: 1px solid var(--divider);
+  border-left: 2px solid var(--accent);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+  font-family: var(--ov-font);
+  cursor: default;
+  animation: toast-in 200ms ease-out;
+}
+
+.ov-toast-icon {
+  flex: 0 0 auto;
+  color: var(--accent);
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.ov-toast-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.ov-toast-msg {
+  font-size: 12px;
+  color: var(--syntax-text);
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ov-toast-detail {
+  font-size: 11px;
+  color: var(--line-num);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Errors keep the same identity; only the accent shifts to amber so it reads as
+ * a warning rather than blending into the success case. No red accents. */
+.ov-toast-error .ov-toast-body {
+  border-left-color: var(--t-warning, #e0b13a);
+}
+
+.ov-toast-error .ov-toast-icon {
+  color: var(--t-warning, #e0b13a);
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ov-toast,
+  .ov-toast-body {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* ---- Header icon button (snapshot) --------------------------------------- */
+.ov-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 18px;
+  padding: 0;
+  margin-left: 2px;
+  color: var(--line-num);
+  background: none;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: color 120ms ease, background-color 120ms ease;
+}
+
+.ov-icon-btn:hover:not(:disabled) {
+  color: var(--cursor);
+  background: var(--accent-soft);
+}
+
+.ov-icon-btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.ov-icon-btn:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.ov-icon-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* ---- Replay range -------------------------------------------------------- */
+.code-line.in-replay {
+  background: var(--accent-soft);
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+
+.ov-replay-tag {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 7px;
+  font: inherit;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid transparent;
+  border-radius: 3px;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: border-color 120ms ease;
+}
+
+.ov-replay-tag:hover {
+  border-color: var(--accent);
+}
+
+.ov-replay-tag:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: 1px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ov-progress-fill {
+    transition: none;
+  }
+}

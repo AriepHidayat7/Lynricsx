@@ -1,0 +1,15 @@
+# Pins the Rust toolchain per-project instead of relying on the machine default.
+#
+# This matters because scripts/with-tools.mjs runs `rustup default
+# stable-x86_64-pc-windows-gnu`, which silently changes a contributor's *global*
+# default. With this file, rustup selects the toolchain from this manifest for
+# commands run inside the project, so a developer's global default is never
+# touched.
+#
+# The GNU host is the project's default build path (see docs/BUILDING.md): it
+# installs without administrator rights, and src-tauri/.cargo/config.toml pins
+# `rust-lld` as its linker. CI deliberately does not rely on this file for test
+# execution — see the MSVC note in docs/BUILDING.md.
+[toolchain]
+channel = "stable-x86_64-pc-windows-gnu"
+profile = "default"
